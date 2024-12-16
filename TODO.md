@@ -1,0 +1,2 @@
+- [ ] Do proper manual play/pause handle
+- [ ] create segments as per most replayed from that video
