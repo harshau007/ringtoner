@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Download, Loader2, Pause, Play } from "lucide-react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 interface VideoInfo {
   title: string;
@@ -27,6 +27,25 @@ export default function Home() {
   const [manualStart, setManualStart] = useState(0);
   const [manualEnd, setManualEnd] = useState(0);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  const downloadCookie = async () => {
+    try {
+      // Fetch the file
+      const response = await fetch("/api/download-cookie");
+
+      // Check if the response is ok
+      if (!response.ok) {
+        throw new Error(`Failed to fetch file: ${response.statusText}`);
+      }
+    } catch (error) {
+      console.error("Error downloading the file:", error);
+      return null;
+    }
+  };
+
+  useEffect(() => {
+    downloadCookie();
+  }, []);
 
   const handleSearch = async () => {
     setLoading(true);

@@ -1,6 +1,8 @@
 import ytdl from "@distube/ytdl-core";
 import ffmpeg from "fluent-ffmpeg";
+import fs from "fs";
 import { NextResponse } from "next/server";
+import path from "path";
 import stream from "stream";
 
 export async function GET(request: Request) {
@@ -15,7 +17,20 @@ export async function GET(request: Request) {
 
   try {
     const url = `https://www.youtube.com/watch?v=${videoId}`;
-    const videoInfo = await ytdl.getInfo(url);
+    const cookieFilePath = path.join(process.cwd(), "cookies.json");
+
+    if (!fs.existsSync(cookieFilePath)) {
+      return NextResponse.json(
+        { error: "Cookie file not found" },
+        { status: 500 }
+      );
+    }
+
+    const cookieData = JSON.parse(fs.readFileSync(cookieFilePath, "utf-8"));
+
+    const agent = ytdl.createAgent(cookieData);
+
+    const videoInfo = await ytdl.getInfo(url, { agent });
     const audioFormat = ytdl.chooseFormat(videoInfo.formats, {
       quality: "highestaudio",
       filter: "audioonly",
